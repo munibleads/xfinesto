@@ -194,19 +194,25 @@ class OntologyGenerator:
         ]
         
         # 调用LLM
-        result = self.llm_client.chat_json(
-            messages=messages,
-            temperature=0.3,
-            max_tokens=4096
-        )
+        try:
+            result = self.llm_client.chat_json(
+                messages=messages,
+                temperature=0.3,
+                max_tokens=4096
+            )
+        except Exception as e:
+            import traceback
+            error_msg = f"LLM调用失败: {str(e)}\n{traceback.format_exc()}"
+            print(error_msg)
+            raise ValueError(error_msg)
         
         # 验证和后处理
         result = self._validate_and_process(result)
         
         return result
     
-    # 传给 LLM 的文本最大长度（5万字）
-    MAX_TEXT_LENGTH_FOR_LLM = 50000
+    # 传给 LLM 的文本最大长度（约3000字符 ≈ 1000-1500 tokens，给 prompt 留空间）
+    MAX_TEXT_LENGTH_FOR_LLM = 3000
     
     def _build_user_message(
         self,
