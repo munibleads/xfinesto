@@ -1,9 +1,9 @@
 services:
   mirofish:
     image: ghcr.io/666ghj/mirofish:latest
-    # 加速镜像（如拉取缓慢可替换上方地址）
+    # Mirror image (use this if the above pull is slow)
     # image: ghcr.nju.edu.cn/666ghj/mirofish:latest
-    container_name: mirofish
+    container_name: mirofish2
     env_file:
       - .env
     ports:
@@ -14,3 +14,8 @@ services:
       - UV_LINK_MODE=copy
     volumes:
       - ./backend/uploads:/app/backend/uploads
+      - ./frontend:/app/frontend
+      - ./backend:/app/backend
+      - /app/frontend/node_modules
+      - /app/node_modules
+      - /app/backend/.venv

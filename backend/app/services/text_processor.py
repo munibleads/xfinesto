@@ -1,5 +1,5 @@
 """
-文本处理服务
+Text processing service
 """
 
 from typing import List, Optional
@@ -7,7 +7,7 @@ from ..utils.file_parser import FileParser, split_text_into_chunks
 
 
 class TextProcessor:
-    """文本处理器"""
+    """Text processor"""
     
     @staticmethod
     def extract_from_files(file_paths: List[str]) -> str:

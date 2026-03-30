@@ -13,7 +13,7 @@
     <!-- 标题区域 -->
     <div class="section-header">
       <div class="section-line"></div>
-      <span class="section-title">推演记录</span>
+      <span class="section-title">Simulation Records</span>
       <div class="section-line"></div>
     </div>
 
@@ -36,16 +36,16 @@
             <span 
               class="status-icon" 
               :class="{ available: project.project_id, unavailable: !project.project_id }"
-              title="图谱构建"
+              title="Graph Construction"
             >◇</span>
             <span 
               class="status-icon available" 
-              title="环境搭建"
+              title="Environment Setup"
             >◈</span>
             <span 
               class="status-icon" 
               :class="{ available: project.report_id, unavailable: !project.report_id }"
-              title="分析报告"
+              title="Analysis Report"
             >◆</span>
           </div>
         </div>
@@ -67,13 +67,13 @@
             </div>
             <!-- 如果有更多文件，显示提示 -->
             <div v-if="project.files.length > 3" class="files-more">
-              +{{ project.files.length - 3 }} 个文件
-            </div>
+          +{{ project.files.length - 3 }} more files
+        </div>
           </div>
           <!-- 无文件时的占位 -->
           <div class="files-empty" v-else>
             <span class="empty-file-icon">◇</span>
-            <span class="empty-file-text">暂无文件</span>
+            <span class="empty-file-text">No files</span>
           </div>
         </div>
 
@@ -99,10 +99,10 @@
       </div>
     </div>
 
-    <!-- 加载状态 -->
+    <!-- Loading State -->
     <div v-if="loading" class="loading-state">
       <span class="loading-spinner"></span>
-      <span class="loading-text">加载中...</span>
+      <span class="loading-text">Loading...</span>
     </div>
 
     <!-- 历史回放详情弹窗 -->
@@ -143,10 +143,10 @@
               </div>
             </div>
 
-            <!-- 推演回放分割线 -->
+            <!-- Simulation Playback Divider -->
             <div class="modal-divider">
               <span class="divider-line"></span>
-              <span class="divider-text">推演回放</span>
+              <span class="divider-text">Simulation Playback</span>
               <span class="divider-line"></span>
             </div>
 
@@ -179,9 +179,9 @@
                 <span class="btn-text">分析报告</span>
               </button>
             </div>
-            <!-- 不可回放提示 -->
+            <!-- Playback Hint -->
             <div class="modal-playback-hint">
-              <span class="hint-text">Step3「开始模拟」与 Step5「深度互动」需在运行中启动，不支持历史回放</span>
+              <span class="hint-text">Step 3 "Start Simulation" and Step 5 "Deep Interaction" need to be launched during runtime and do not support historical playback</span>
             </div>
           </div>
         </div>

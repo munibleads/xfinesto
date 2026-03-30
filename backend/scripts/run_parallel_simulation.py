@@ -1127,7 +1127,13 @@ async def run_twitter_simulation(
     log_info("初始化...")
     
     # Twitter 使用通用 LLM 配置
-    model = create_model(config, use_boost=False)
+    log_info("正在创建 LLM 模型...")
+    try:
+        model = create_model(config, use_boost=False)
+        log_info("LLM 模型创建成功")
+    except Exception as e:
+        log_info(f"LLM 模型创建失败: {e}")
+        raise
     
     # OASIS Twitter使用CSV格式
     profile_path = os.path.join(simulation_dir, "twitter_profiles.csv")
@@ -1135,11 +1141,24 @@ async def run_twitter_simulation(
         log_info(f"错误: Profile文件不存在: {profile_path}")
         return result
     
-    result.agent_graph = await generate_twitter_agent_graph(
-        profile_path=profile_path,
-        model=model,
-        available_actions=TWITTER_ACTIONS,
-    )
+    log_info(f"正在生成 Twitter Agent 图谱 (profile: {profile_path})...")
+    try:
+        result.agent_graph = await asyncio.wait_for(
+            generate_twitter_agent_graph(
+                profile_path=profile_path,
+                model=model,
+                available_actions=TWITTER_ACTIONS,
+            ),
+            timeout=300  # 5分钟超时
+        )
+        agent_count = len(list(result.agent_graph.get_agents()))
+        log_info(f"Agent 图谱生成成功，共 {agent_count} 个 agent")
+    except asyncio.TimeoutError:
+        log_info("错误: Agent 图谱生成超时 (5分钟)")
+        raise
+    except Exception as e:
+        log_info(f"Agent 图谱生成失败: {e}")
+        raise
     
     # 从配置文件获取 Agent 真实名称映射（使用 entity_name 而非默认的 Agent_X）
     agent_names = get_agent_names_from_config(config)
@@ -1152,14 +1171,30 @@ async def run_twitter_simulation(
     if os.path.exists(db_path):
         os.remove(db_path)
     
-    result.env = oasis.make(
-        agent_graph=result.agent_graph,
-        platform=oasis.DefaultPlatformType.TWITTER,
-        database_path=db_path,
-        semaphore=30,  # 限制最大并发 LLM 请求数，防止 API 过载
-    )
+    log_info("正在创建 Twitter 模拟环境...")
+    try:
+        result.env = oasis.make(
+            agent_graph=result.agent_graph,
+            platform=oasis.DefaultPlatformType.TWITTER,
+            database_path=db_path,
+            semaphore=30,  # 限制最大并发 LLM 请求数，防止 API 过载
+        )
+        log_info("模拟环境创建成功")
+    except Exception as e:
+        log_info(f"模拟环境创建失败: {e}")
+        raise
     
-    await result.env.reset()
+    log_info("正在重置模拟环境...")
+    try:
+        await asyncio.wait_for(result.env.reset(), timeout=60)
+        log_info("环境重置成功")
+    except asyncio.TimeoutError:
+        log_info("错误: 环境重置超时 (60秒)")
+        raise
+    except Exception as e:
+        log_info(f"环境重置失败: {e}")
+        raise
+    
     log_info("环境已启动")
     
     if action_logger:
@@ -1319,18 +1354,37 @@ async def run_reddit_simulation(
     log_info("初始化...")
     
     # Reddit 使用加速 LLM 配置（如果有的话，否则回退到通用配置）
-    model = create_model(config, use_boost=True)
+    log_info("正在创建 LLM 模型...")
+    try:
+        model = create_model(config, use_boost=True)
+        log_info("LLM 模型创建成功")
+    except Exception as e:
+        log_info(f"LLM 模型创建失败: {e}")
+        raise
     
     profile_path = os.path.join(simulation_dir, "reddit_profiles.json")
     if not os.path.exists(profile_path):
         log_info(f"错误: Profile文件不存在: {profile_path}")
         return result
     
-    result.agent_graph = await generate_reddit_agent_graph(
-        profile_path=profile_path,
-        model=model,
-        available_actions=REDDIT_ACTIONS,
-    )
+    log_info(f"正在生成 Reddit Agent 图谱 (profile: {profile_path})...")
+    try:
+        result.agent_graph = await asyncio.wait_for(
+            generate_reddit_agent_graph(
+                profile_path=profile_path,
+                model=model,
+                available_actions=REDDIT_ACTIONS,
+            ),
+            timeout=300  # 5分钟超时
+        )
+        agent_count = len(list(result.agent_graph.get_agents()))
+        log_info(f"Agent 图谱生成成功，共 {agent_count} 个 agent")
+    except asyncio.TimeoutError:
+        log_info("错误: Agent 图谱生成超时 (5分钟)")
+        raise
+    except Exception as e:
+        log_info(f"Agent 图谱生成失败: {e}")
+        raise
     
     # 从配置文件获取 Agent 真实名称映射（使用 entity_name 而非默认的 Agent_X）
     agent_names = get_agent_names_from_config(config)
@@ -1343,14 +1397,30 @@ async def run_reddit_simulation(
     if os.path.exists(db_path):
         os.remove(db_path)
     
-    result.env = oasis.make(
-        agent_graph=result.agent_graph,
-        platform=oasis.DefaultPlatformType.REDDIT,
-        database_path=db_path,
-        semaphore=30,  # 限制最大并发 LLM 请求数，防止 API 过载
-    )
+    log_info("正在创建 Reddit 模拟环境...")
+    try:
+        result.env = oasis.make(
+            agent_graph=result.agent_graph,
+            platform=oasis.DefaultPlatformType.REDDIT,
+            database_path=db_path,
+            semaphore=30,  # 限制最大并发 LLM 请求数，防止 API 过载
+        )
+        log_info("模拟环境创建成功")
+    except Exception as e:
+        log_info(f"模拟环境创建失败: {e}")
+        raise
     
-    await result.env.reset()
+    log_info("正在重置模拟环境...")
+    try:
+        await asyncio.wait_for(result.env.reset(), timeout=60)
+        log_info("环境重置成功")
+    except asyncio.TimeoutError:
+        log_info("错误: 环境重置超时 (60秒)")
+        raise
+    except Exception as e:
+        log_info(f"环境重置失败: {e}")
+        raise
+    
     log_info("环境已启动")
     
     if action_logger:
@@ -1576,17 +1646,41 @@ async def main():
     twitter_result: Optional[PlatformSimulation] = None
     reddit_result: Optional[PlatformSimulation] = None
     
-    if args.twitter_only:
-        twitter_result = await run_twitter_simulation(config, simulation_dir, twitter_logger, log_manager, args.max_rounds)
-    elif args.reddit_only:
-        reddit_result = await run_reddit_simulation(config, simulation_dir, reddit_logger, log_manager, args.max_rounds)
-    else:
-        # 并行运行（每个平台使用独立的日志记录器）
-        results = await asyncio.gather(
-            run_twitter_simulation(config, simulation_dir, twitter_logger, log_manager, args.max_rounds),
-            run_reddit_simulation(config, simulation_dir, reddit_logger, log_manager, args.max_rounds),
-        )
-        twitter_result, reddit_result = results
+    log_manager.info("开始运行模拟...")
+    
+    try:
+        if args.twitter_only:
+            twitter_result = await run_twitter_simulation(config, simulation_dir, twitter_logger, log_manager, args.max_rounds)
+        elif args.reddit_only:
+            reddit_result = await run_reddit_simulation(config, simulation_dir, reddit_logger, log_manager, args.max_rounds)
+        else:
+            # 并行运行（每个平台使用独立的日志记录器）
+            log_manager.info("并行启动 Twitter 和 Reddit 模拟...")
+            results = await asyncio.gather(
+                run_twitter_simulation(config, simulation_dir, twitter_logger, log_manager, args.max_rounds),
+                run_reddit_simulation(config, simulation_dir, reddit_logger, log_manager, args.max_rounds),
+                return_exceptions=True  # 捕获异常而不是抛出
+            )
+            
+            # 检查结果
+            if isinstance(results[0], Exception):
+                log_manager.error(f"Twitter 模拟失败: {results[0]}")
+                raise results[0]
+            else:
+                twitter_result = results[0]
+                
+            if isinstance(results[1], Exception):
+                log_manager.error(f"Reddit 模拟失败: {results[1]}")
+                raise results[1]
+            else:
+                reddit_result = results[1]
+                
+            log_manager.info("两个平台模拟都已完成")
+    except Exception as e:
+        log_manager.error(f"模拟执行失败: {e}")
+        import traceback
+        log_manager.error(f"错误详情: {traceback.format_exc()}")
+        raise
     
     total_elapsed = (datetime.now() - start_time).total_seconds()
     log_manager.info("=" * 60)
