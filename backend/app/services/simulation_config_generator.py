@@ -215,11 +215,11 @@ class SimulationConfigGenerator:
     AGENTS_PER_BATCH = 15
     
     # 各步骤的上下文截断长度（字符数）
-    TIME_CONFIG_CONTEXT_LENGTH = 10000   # 时间配置
-    EVENT_CONFIG_CONTEXT_LENGTH = 8000   # 事件配置
-    ENTITY_SUMMARY_LENGTH = 300          # 实体摘要
-    AGENT_SUMMARY_LENGTH = 300           # Agent配置中的实体摘要
-    ENTITIES_PER_TYPE_DISPLAY = 20       # 每类实体显示数量
+    TIME_CONFIG_CONTEXT_LENGTH = 4000   # 时间配置
+    EVENT_CONFIG_CONTEXT_LENGTH = 3500   # 事件配置
+    ENTITY_SUMMARY_LENGTH = 200          # 实体摘要
+    AGENT_SUMMARY_LENGTH = 200           # Agent配置中的实体摘要
+    ENTITIES_PER_TYPE_DISPLAY = 15       # 每类实体显示数量
     
     def __init__(
         self,
@@ -534,14 +534,14 @@ class SimulationConfigGenerator:
     def _generate_time_config(self, context: str, num_entities: int) -> Dict[str, Any]:
         """生成时间配置"""
         # 使用配置的上下文截断长度
-        context_truncated = context[:self.TIME_CONFIG_CONTEXT_LENGTH]
+        context_str = context[:1500] if context else "无额外上下文"
         
         # 计算最大允许值（80%的agent数）
         max_agents_allowed = max(1, int(num_entities * 0.9))
         
         prompt = f"""基于以下模拟需求，生成时间模拟配置。
 
-{context_truncated}
+{context_str}
 
 ## 任务
 请生成时间配置JSON。
@@ -669,12 +669,13 @@ class SimulationConfigGenerator:
         ])
         
         # 使用配置的上下文截断长度
-        context_truncated = context[:self.EVENT_CONFIG_CONTEXT_LENGTH]
+        context_str = context[:1500] if context else "无额外上下文"
         
         prompt = f"""基于以下模拟需求，生成事件配置。
 
 模拟需求: {simulation_requirement}
 
+{context_str}
 {context_truncated}
 
 ## 可用实体类型及示例
