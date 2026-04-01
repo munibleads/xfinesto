@@ -1,13 +1,8 @@
 <template>
   <div class="home-container">
-    <!-- 顶部导航栏 -->
+    <!-- Top Navigation Bar -->
     <nav class="navbar">
       <div class="nav-brand">XFinesto</div>
-      <div class="nav-links">
-        <a href="https://github.com/666ghj/XFinesto" target="_blank" class="github-link">
-          Visit our Github <span class="arrow">↗</span>
-        </a>
-      </div>
     </nav>
 
     <div class="main-content">
@@ -20,16 +15,16 @@
           </div>
           
           <h1 class="main-title">
-            Upload Any Report<br>
-            <span class="gradient-text">Instantly Simulate the Future</span>
+            Upload your project/research<br>
+            <span class="gradient-text">to simulate the future</span>
           </h1>
           
           <div class="hero-desc">
             <p>
-              Even with just a paragraph of text, <span class="highlight-bold">XFinesto</span> can extract the reality seeds within and automatically generate a parallel world with up to <span class="highlight-orange">million-level Agents</span>. Inject variables from a god's-eye view to find <span class="highlight-code">"local optimal solutions"</span> in complex group interactions under dynamic environments.
+              Upload your project proposal, research paper, or business plan — <span class="highlight-bold">XFinesto</span> extracts the reality seeds within and generates a parallel world with up to <span class="highlight-orange">million-level Agents</span>. Test assumptions, predict outcomes, and find <span class="highlight-code">"local optimal solutions"</span> before committing real resources.
             </p>
             <p class="slogan-text">
-              Let the future preplay in Agent swarms, let decisions triumph after a hundred battles<span class="blinking-cursor">_</span>
+              Let your idea battle-test in Agent swarms, let decisions triumph after a hundred simulations<span class="blinking-cursor">_</span>
             </p>
           </div>
            
@@ -314,13 +309,12 @@ const startSimulation = () => {
   --gray-light: #F5F5F5;
   --gray-text: #666666;
   --border: #E5E5E5;
-/* 
+  /*
     Use Space Grotesk as primary heading font, JetBrains Mono as code/label font
-    Ensure these Google Fonts are imported in index.html 
+    Ensure these Google Fonts are imported in index.html
   */
   --font-mono: 'JetBrains Mono', monospace;
-  --font-sans: 'Space Grotesk', 'Noto Sans SC', system-ui, sans-serif;
-  --font-cn: 'Noto Sans SC', system-ui, sans-serif;
+  --font-sans: 'Space Grotesk', system-ui, sans-serif;
 }
 
 .home-container {
@@ -835,7 +829,7 @@ const startSimulation = () => {
   overflow: hidden;
 }
 
-/* 可点击状态（非禁用） */
+/* Clickable state (not disabled) */
 .start-engine-btn:not(:disabled) {
   background: var(--black);
   border: 1px solid var(--black);
@@ -860,14 +854,14 @@ const startSimulation = () => {
   border: 1px solid #E5E5E5;
 }
 
-/* 引导动画：微妙的边框脉冲 */
+/* Guide animation: subtle border pulse */
 @keyframes pulse-border {
   0% { box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.2); }
   70% { box-shadow: 0 0 0 6px rgba(0, 0, 0, 0); }
   100% { box-shadow: 0 0 0 0 rgba(0, 0, 0, 0); }
 }
 
-/* 响应式适配 */
+/* Responsive adaptation */
 @media (max-width: 1024px) {
   .dashboard-section {
     flex-direction: column;

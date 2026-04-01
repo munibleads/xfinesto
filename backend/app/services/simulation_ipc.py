@@ -311,12 +311,12 @@ class SimulationIPCServer:
         self._running = False
     
     def start(self):
-        """标记服务器为运行状态"""
+        """Mark server as running"""
         self._running = True
         self._update_env_status("alive")
     
     def stop(self):
-        """标记服务器为停止状态"""
+        """Mark server as stopped"""
         self._running = False
         self._update_env_status("stopped")
     
@@ -386,7 +386,7 @@ class SimulationIPCServer:
         ))
     
     def send_error(self, command_id: str, error: str):
-        """发送错误响应"""
+        """Send error response"""
         self.send_response(IPCResponse(
             command_id=command_id,
             status=CommandStatus.FAILED,

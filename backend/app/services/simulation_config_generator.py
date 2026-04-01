@@ -30,7 +30,7 @@ CHINA_TIMEZONE_CONFIG = {
     "dead_hours": [0, 1, 2, 3, 4, 5],
     # Morning hours (gradually waking up)
     "morning_hours": [6, 7, 8],
-    # 工作时段
+    # Work hours
     "work_hours": [9, 10, 11, 12, 13, 14, 15, 16, 17, 18],
     # Evening peak hours (most active)
     "peak_hours": [19, 20, 21, 22],
@@ -38,11 +38,11 @@ CHINA_TIMEZONE_CONFIG = {
     "night_hours": [23],
     # Activity multipliers
     "activity_multipliers": {
-        "dead": 0.05,      # 凌晨几乎无人
-        "morning": 0.4,    # 早间逐渐活跃
-        "work": 0.7,       # 工作时段中等
-        "peak": 1.5,       # 晚间高峰
-        "night": 0.5       # 深夜下降
+        "dead": 0.05,      # Almost no one at dawn
+        "morning": 0.4,    # Morning gradually becomes active
+        "work": 0.7,       # Working hours medium
+        "peak": 1.5,       # Evening peak
+        "night": 0.5       # Late night decline
     }
 }
 
@@ -56,7 +56,7 @@ class AgentActivityConfig:
     entity_type: str
     
     # Activity level config (0.0-1.0)
-    activity_level: float = 0.5  # 整体活跃度
+    activity_level: float = 0.5  # Overall activity level
     
     # Post frequency (expected posts per hour)
     posts_per_hour: float = 1.0
@@ -83,7 +83,7 @@ class AgentActivityConfig:
 class TimeSimulationConfig:
     """Time simulation config (based on Chinese daily routines)"""
     # Total simulation duration (simulated hours)
-    total_simulation_hours: int = 72  # 默认模拟72小时（3天）
+    total_simulation_hours: int = 72  # Default simulation 72 hours (3 days)
     
     # Time per round (simulated minutes) - default 60 minutes (1 hour), accelerates time flow
     minutes_per_round: int = 60
@@ -98,13 +98,13 @@ class TimeSimulationConfig:
     
     # Off-peak hours (early morning 0-5, almost no activity)
     off_peak_hours: List[int] = field(default_factory=lambda: [0, 1, 2, 3, 4, 5])
-    off_peak_activity_multiplier: float = 0.05  # 凌晨活跃度极低
+    off_peak_activity_multiplier: float = 0.05  # Extremely low activity at dawn
     
-    # 早间时段
+    # Morning hours
     morning_hours: List[int] = field(default_factory=lambda: [6, 7, 8])
     morning_activity_multiplier: float = 0.4
     
-    # 工作时段
+    # Work hours
     work_hours: List[int] = field(default_factory=lambda: [9, 10, 11, 12, 13, 14, 15, 16, 17, 18])
     work_activity_multiplier: float = 0.7
 
@@ -131,9 +131,9 @@ class PlatformConfig:
     platform: str  # twitter or reddit
     
     # Recency weight
-    recency_weight: float = 0.4  # 时间新鲜度
-    popularity_weight: float = 0.3  # 热度
-    relevance_weight: float = 0.3  # 相关性
+    recency_weight: float = 0.4  # Time freshness
+    popularity_weight: float = 0.3  # Popularity
+    relevance_weight: float = 0.3  # Relevance
     
     # Viral spread threshold (interactions needed to trigger diffusion)
     viral_threshold: int = 10
@@ -151,13 +151,13 @@ class SimulationParameters:
     graph_id: str
     simulation_requirement: str
     
-    # 时间配置
+    # Time config
     time_config: TimeSimulationConfig = field(default_factory=TimeSimulationConfig)
     
     # Agent config list
     agent_configs: List[AgentActivityConfig] = field(default_factory=list)
     
-    # 事件配置
+    # Event config
     event_config: EventConfig = field(default_factory=EventConfig)
     
     # Platform config
@@ -170,7 +170,7 @@ class SimulationParameters:
     
     # Generation metadata
     generated_at: str = field(default_factory=lambda: datetime.now().isoformat())
-    generation_reasoning: str = ""  # LLM的推理说明
+    generation_reasoning: str = ""  # LLM reasoning explanation
     
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dict"""
@@ -282,7 +282,7 @@ class SimulationConfigGenerator:
                 progress_callback(step, total_steps, message)
             logger.info(f"[{step}/{total_steps}] {message}")
         
-        # 1. Build base context info
+        # Build base context info
         context = self._build_context(
             simulation_requirement=simulation_requirement,
             document_text=document_text,
@@ -357,7 +357,7 @@ class SimulationConfigGenerator:
                 echo_chamber_strength=0.6
             )
         
-        # 构建最终参数
+        # Build final parameters
         params = SimulationParameters(
             simulation_id=simulation_id,
             project_id=project_id,
@@ -390,8 +390,8 @@ class SimulationConfigGenerator:
         
         # Build context
         context_parts = [
-            f"## 模拟需求\n{simulation_requirement}",
-            f"\n## 实体信息 ({len(entities)}个)\n{entity_summary}",
+            f"## Simulation Requirements\n{simulation_requirement}",
+            f"\n## Entity Info ({len(entities)} entities)\n{entity_summary}",
         ]
         
         current_length = sum(len(p) for p in context_parts)
@@ -446,25 +446,25 @@ class SimulationConfigGenerator:
                         {"role": "user", "content": prompt}
                     ],
                     response_format={"type": "json_object"},
-                    temperature=0.7 - (attempt * 0.1)  # 每次重试降低温度
-                    # 不设置max_tokens，让LLM自由发挥
+                    temperature=0.7 - (attempt * 0.1),  # Decrease temperature each retry
+                    max_tokens=2048
                 )
                 
                 content = response.choices[0].message.content
                 finish_reason = response.choices[0].finish_reason
                 
-                # 检查是否被截断
+                # Check if truncated
                 if finish_reason == 'length':
                     logger.warning(f"LLM output truncated (attempt {attempt+1})")
                     content = self._fix_truncated_json(content)
                 
-                # 尝试解析JSON
+                # Try to parse JSON
                 try:
                     return json.loads(content)
                 except json.JSONDecodeError as e:
                     logger.warning(f"JSON parse failed (attempt {attempt+1}): {str(e)[:80]}")
                     
-                    # 尝试修复JSON
+                    # Try to fix JSON
                     fixed = self._try_fix_config_json(content)
                     if fixed:
                         return fixed
@@ -501,15 +501,15 @@ class SimulationConfigGenerator:
         """Try to fix config JSON"""
         import re
         
-        # 修复被截断的情况
+        # Fix truncated case
         content = self._fix_truncated_json(content)
         
-        # 提取JSON部分
+        # Extract JSON part
         json_match = re.search(r'\{[\s\S]*\}', content)
         if json_match:
             json_str = json_match.group()
             
-            # 移除字符串中的换行符
+            # Remove newlines from strings
             def fix_string(match):
                 s = match.group(0)
                 s = s.replace('\n', ' ').replace('\r', ' ')
@@ -521,7 +521,7 @@ class SimulationConfigGenerator:
             try:
                 return json.loads(json_str)
             except:
-                # 移除所有控制字符
+                # Remove all control characters
                 json_str = re.sub(r'[\x00-\x1f\x7f-\x9f]', '', json_str)
                 json_str = re.sub(r'\s+', ' ', json_str)
                 try:
@@ -596,7 +596,7 @@ Field descriptions:
         """Get default time config (Chinese daily routines)"""
         return {
             "total_simulation_hours": 72,
-            "minutes_per_round": 60,  # 每轮1小时，加快时间流速
+            "minutes_per_round": 60,  # 1 hour per round, accelerate time flow
             "agents_per_hour_min": max(1, num_entities // 15),
             "agents_per_hour_max": max(5, num_entities // 5),
             "peak_hours": [19, 20, 21, 22],
@@ -628,7 +628,7 @@ Field descriptions:
         
         return TimeSimulationConfig(
             total_simulation_hours=result.get("total_simulation_hours", 72),
-            minutes_per_round=result.get("minutes_per_round", 60),  # 默认每轮1小时
+            minutes_per_round=result.get("minutes_per_round", 60),  # Default 1 hour per round
             agents_per_hour_min=agents_per_hour_min,
             agents_per_hour_max=agents_per_hour_max,
             peak_hours=result.get("peak_hours", [19, 20, 21, 22]),
@@ -951,7 +951,7 @@ Return JSON format (no markdown):
                 "activity_level": 0.8,
                 "posts_per_hour": 0.6,
                 "comments_per_hour": 1.5,
-                "active_hours": [8, 9, 10, 11, 12, 13, 18, 19, 20, 21, 22, 23],  # 上午+晚间
+                "active_hours": [8, 9, 10, 11, 12, 13, 18, 19, 20, 21, 22, 23],  # Morning + evening
                 "response_delay_min": 1,
                 "response_delay_max": 15,
                 "sentiment_bias": 0.0,
@@ -964,7 +964,7 @@ Return JSON format (no markdown):
                 "activity_level": 0.6,
                 "posts_per_hour": 0.4,
                 "comments_per_hour": 0.8,
-                "active_hours": [12, 13, 19, 20, 21, 22, 23],  # 午休+晚间
+                "active_hours": [12, 13, 19, 20, 21, 22, 23],  # Lunch break + evening
                 "response_delay_min": 5,
                 "response_delay_max": 30,
                 "sentiment_bias": 0.0,
@@ -977,7 +977,7 @@ Return JSON format (no markdown):
                 "activity_level": 0.7,
                 "posts_per_hour": 0.5,
                 "comments_per_hour": 1.2,
-                "active_hours": [9, 10, 11, 12, 13, 18, 19, 20, 21, 22, 23],  # 白天+晚间
+                "active_hours": [9, 10, 11, 12, 13, 18, 19, 20, 21, 22, 23],  # Daytime + evening
                 "response_delay_min": 2,
                 "response_delay_max": 20,
                 "sentiment_bias": 0.0,

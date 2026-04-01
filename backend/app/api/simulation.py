@@ -21,7 +21,7 @@ logger = get_logger('mirofish.api.simulation')
 
 # Interview prompt optimization prefix
 # Adding this prefix prevents the Agent from calling tools and forces a direct text response
-INTERVIEW_PROMPT_PREFIX = "结合你的人设、所有的过往记忆与行动，不调用任何工具直接用文本回复我："
+INTERVIEW_PROMPT_PREFIX = "Based on your character, all past memories and actions, reply to me directly with text without calling any tools:"
 
 
 def optimize_interview_prompt(prompt: str) -> str:

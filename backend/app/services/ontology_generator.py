@@ -59,8 +59,8 @@ Reflect real connections in social media interactions: WORKS_FOR, STUDIES_AT, AF
 
 class OntologyGenerator:
     """
-    本体生成器
-    分析文本内容，生成实体和关系类型定义
+    Ontology Generator
+    Analyzes text content and generates entity and relationship type definitions
     """
     
     def __init__(self, llm_client: Optional[LLMClient] = None):
@@ -95,7 +95,7 @@ class OntologyGenerator:
             {"role": "user", "content": user_message}
         ]
         
-        # 调用LLM
+        # Call LLM
         try:
             result = self.llm_client.chat_json(
                 messages=messages,
@@ -104,16 +104,16 @@ class OntologyGenerator:
             )
         except Exception as e:
             import traceback
-            error_msg = f"LLM调用失败: {str(e)}\n{traceback.format_exc()}"
+            error_msg = f"LLM call failed: {str(e)}\n{traceback.format_exc()}"
             print(error_msg)
             raise ValueError(error_msg)
         
-        # 验证和后处理
+        # Validation and post-processing
         result = self._validate_and_process(result)
         
         return result
     
-    # 传给 LLM 的文本最大长度（约800字符 ≈ 300-400 tokens，给长prompt留空间）
+    # Max text length to pass to LLM (~800 chars ≈ 300-400 tokens, leaves room for long prompt)
     MAX_TEXT_LENGTH_FOR_LLM = 800
     
     def _build_user_message(
@@ -122,7 +122,7 @@ class OntologyGenerator:
         simulation_requirement: str,
         additional_context: Optional[str]
     ) -> str:
-        """构建用户消息"""
+        """Build user message"""
         
         # Combine texts
         combined_text = "\n\n---\n\n".join(document_texts)
@@ -276,7 +276,7 @@ Based on the above content, design entity types and relationship types suitable 
             '',
         ]
         
-        # 生成实体类型
+        # Generate entity types
         for entity in ontology.get("entity_types", []):
             name = entity["name"]
             desc = entity.get("description", f"A {name} entity.")
@@ -302,10 +302,10 @@ Based on the above content, design entity types and relationship types suitable 
         code_lines.append('# ============== Relationship Type Definitions ==============')
         code_lines.append('')
         
-        # 生成关系类型
+        # Generate relationship types
         for edge in ontology.get("edge_types", []):
             name = edge["name"]
-            # 转换为PascalCase类名
+            # Convert to PascalCase class name
             class_name = ''.join(word.capitalize() for word in name.split('_'))
             desc = edge.get("description", f"A {name} relationship.")
             
@@ -327,7 +327,7 @@ Based on the above content, design entity types and relationship types suitable 
             code_lines.append('')
             code_lines.append('')
         
-        # 生成类型字典
+        # Generate type dictionaries
         code_lines.append('# ============== Type Configuration ==============')
         code_lines.append('')
         code_lines.append('ENTITY_TYPES = {')
@@ -344,7 +344,7 @@ Based on the above content, design entity types and relationship types suitable 
         code_lines.append('}')
         code_lines.append('')
         
-        # 生成边的source_targets映射
+        # Generate edge source_targets mapping
         code_lines.append('EDGE_SOURCE_TARGETS = {')
         for edge in ontology.get("edge_types", []):
             name = edge["name"]

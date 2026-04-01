@@ -172,7 +172,7 @@ class GraphBuilderService:
             
             graph_info = self._get_graph_info(graph_id)
             
-            # 完成
+            # Complete
             self.task_manager.complete_task(task_id, {
                 "graph_id": graph_id,
                 "graph_info": graph_info.to_dict(),
@@ -314,7 +314,7 @@ class GraphBuilderService:
                 for chunk in batch_chunks
             ]
             
-            # 发送到Zep
+            # Send to Zep
             try:
                 batch_result = self.client.graph.add_batch(
                     graph_id=graph_id,

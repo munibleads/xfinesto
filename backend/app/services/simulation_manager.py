@@ -325,7 +325,7 @@ class SimulationManager:
                         item_name=msg
                     )
             
-            # 设置实时保存的文件路径（优先使用 Reddit JSON 格式）
+            # Set real-time save file path (prefer Reddit JSON format)
             realtime_output_path = None
             realtime_platform = "reddit"
             if state.enable_reddit:

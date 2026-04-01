@@ -113,9 +113,9 @@
             <span class="step-title">GraphRAG Construction</span>
           </div>
           <div class="step-status">
-            <span v-if="currentPhase > 1" class="badge success">已完成</span>
+            <span v-if="currentPhase > 1" class="badge success">Completed</span>
             <span v-else-if="currentPhase === 1" class="badge processing">{{ buildProgress?.progress || 0 }}%</span>
-            <span v-else class="badge pending">等待</span>
+            <span v-else class="badge pending">Waiting</span>
           </div>
         </div>
 
