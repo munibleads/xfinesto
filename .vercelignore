@@ -1,0 +1,8 @@
+backend/
+*.py
+pyproject.toml
+requirements.txt
+uv.lock
+.dockerignore
+Dockerfile
+docker-compose.yml
